@@ -7,6 +7,10 @@
   <ItemGroup>
     <Folder Include="wwwroot\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\asmd_Habbo.swf" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.1" />
@@ -16,9 +20,6 @@
     <ProjectReference Include="..\TanjiCore.Intercept\TanjiCore.Intercept.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Update="asmd_Habbo.swf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Kestrel.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
