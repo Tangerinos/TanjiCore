@@ -104,7 +104,7 @@ namespace TanjiCore.Intercept.Network
 
                         buffer = Encoding.UTF8.GetBytes("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
                             "<cross-domain-policy xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"http://www.adobe.com/xml/schemas/PolicyFileSocket.xsd\">" +
-                            "<allow-access-from domain=\"*\" to-ports=\"843,993,25001-25010,38101,40001,40002,30000-30100\"/>" +
+                            "<allow-access-from domain=\"localhost\" to-ports=\"38101\"/>" +
                             "</cross-domain-policy>\0");
                         Local.Send(buffer);
                         continue;
@@ -145,13 +145,27 @@ namespace TanjiCore.Intercept.Network
             HMessage packet = Local.ReceivePacket();
             if (packet != null)
             {
+                if (packet.Header == 4001)
+                {
+                    Local.Encrypter = new Crypto.RC4(Encoding.ASCII.GetBytes(packet.ReadString()));
+                    Local.IsEncrypting = true;
+                }
+
+                if (packet.Header == 157)
+                {
+                    packet = new HMessage(157, 401, "https://images.habbo.com/gordon/PRODUCTION-201703291204-497451196/", "https://www.habbo.com/gamedata/external_variables/1");
+                }
+
                 var args = new DataInterceptedEventArgs(packet, ++_outSteps, true);
                 try { OnDataOutgoing(args); }
                 catch { args.Restore(); }
 
                 if (!args.IsBlocked && !args.WasRelayed)
                 {
-                    SendToServer(args.Packet);
+                    if (Local.IsEncrypting)
+                        SendToServer(Local.Encrypter.Parse(args.Packet.ToBytes()));
+                    else
+                        SendToServer(args.Packet);
                 }
                 if (!args.HasContinued)
                 {
