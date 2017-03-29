@@ -526,7 +526,7 @@ namespace TanjiCore.Intercept.Network.Protocol
             var buffer = new List<byte>();
             foreach (object value in values)
             {
-                /*switch (Type.GetTypeCode(value.GetType()))
+                switch (Type.GetTypeCode(value.GetType()))
                 {
                     case TypeCode.Byte: buffer.Add((byte)value); break;
                     case TypeCode.Boolean: buffer.Add(Convert.ToByte((bool)value)); break;
@@ -543,7 +543,7 @@ namespace TanjiCore.Intercept.Network.Protocol
                         buffer.AddRange(data);
                         break;
                     }
-                }*/
+                }
             }
             return buffer.ToArray();
         }
@@ -605,7 +605,7 @@ namespace TanjiCore.Intercept.Network.Protocol
         {
             Skip(pattern);
 
-            /*switch (Type.GetTypeCode(typeof(T)))
+            switch (Type.GetTypeCode(typeof(T)))
             {
                 case TypeCode.String: return (T)(object)ReadString();
                 case TypeCode.Int32: return (T)(object)ReadInteger();
@@ -613,9 +613,7 @@ namespace TanjiCore.Intercept.Network.Protocol
                 case TypeCode.Boolean: return (T)(object)ReadBoolean();
                 case TypeCode.Double: return (T)(object)ReadDouble();
                 default: return default(T);
-            }*/
-
-            return default(T);
+            }
         }
     }
 }

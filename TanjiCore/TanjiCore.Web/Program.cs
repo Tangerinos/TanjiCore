@@ -40,12 +40,12 @@ namespace TanjiCore.Web
 
         private static void Conn_DataOutgoing(object sender, DataInterceptedEventArgs e)
         {
-            Console.WriteLine(e.Packet.ToString());
+            Console.WriteLine("Outgoing [{0}]: {1}", e.Packet.Header, e.Packet.ToString());
         }
 
         private static void Conn_DataIncoming(object sender, DataInterceptedEventArgs e)
         {
-            Console.WriteLine(e.Packet.ToString());
+            Console.WriteLine("Incoming [{0}]: {1}", e.Packet.Header, e.Packet.ToString());
         }
     }
 }
