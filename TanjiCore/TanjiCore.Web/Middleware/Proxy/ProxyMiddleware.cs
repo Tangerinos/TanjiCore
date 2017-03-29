@@ -160,6 +160,8 @@ namespace TanjiCore.Web.Middleware.Proxy
             }
             else
             {
+                //content = content.Replace("images.habbo.com", "localhost:8081/imagesdomain");
+                //return new ByteArrayContent(Encoding.UTF8.GetBytes(content));
                 return responseMessage.Content;
             }
         }

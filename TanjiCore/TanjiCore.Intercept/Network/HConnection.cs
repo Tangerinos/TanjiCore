@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -77,14 +78,24 @@ namespace TanjiCore.Intercept.Network
                 try
                 {
                     Local = HNode.Accept(endpoint.Port);
+                    byte[] buffer;
+                    Remote = HNode.ConnectNew(endpoint);
                     if (++interceptCount == SocketSkip)
                     {
+                        buffer = Local.Receive(512);
+                        Remote.Send(buffer);
+
+                        buffer = Encoding.UTF8.GetBytes("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+                            "<cross-domain-policy xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"http://www.adobe.com/xml/schemas/PolicyFileSocket.xsd\">" +
+                            "<allow-access-from domain=\"*\" to-ports=\"843,993,25001-25010,38101,40001,40002,30000-30100\"/>" +
+                            "</cross-domain-policy>\0");
+                        Local.Send(buffer);
+
                         interceptCount = 0;
                         continue;
                     }
 
-                    byte[] buffer = Local.Peek(6);
-                    Remote = HNode.ConnectNew(endpoint);
+                    buffer = Local.Peek(6);
                     if (BigEndian.ToUInt16(buffer, 4) == 4000)
                     {
                         IsConnected = true;
@@ -97,11 +108,7 @@ namespace TanjiCore.Intercept.Network
                     }
                     else
                     {
-                        buffer = Local.Receive(512);
-                        Remote.Send(buffer);
-
-                        buffer = Remote.Receive(1024);
-                        Local.Send(buffer);
+                        
                         continue;
                     }
 

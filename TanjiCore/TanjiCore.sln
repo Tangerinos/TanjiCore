@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26228.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TanjiCore.Web", "TanjiCore.Web\TanjiCore.Web.csproj", "{7D2DDBB8-D923-4379-9BE0-D9C83131B131}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TanjiCore.Intercept", "TanjiCore.Intercept\TanjiCore.Intercept.csproj", "{3A112133-4106-423C-8880-E6B67C66235B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TanjiCore.Intercept", "TanjiCore.Intercept\TanjiCore.Intercept.csproj", "{B7004F5A-44B5-4AC6-BE71-B61D3A609FAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{7D2DDBB8-D923-4379-9BE0-D9C83131B131}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D2DDBB8-D923-4379-9BE0-D9C83131B131}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D2DDBB8-D923-4379-9BE0-D9C83131B131}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3A112133-4106-423C-8880-E6B67C66235B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3A112133-4106-423C-8880-E6B67C66235B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3A112133-4106-423C-8880-E6B67C66235B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3A112133-4106-423C-8880-E6B67C66235B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7004F5A-44B5-4AC6-BE71-B61D3A609FAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7004F5A-44B5-4AC6-BE71-B61D3A609FAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7004F5A-44B5-4AC6-BE71-B61D3A609FAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7004F5A-44B5-4AC6-BE71-B61D3A609FAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
