@@ -28,11 +28,7 @@ namespace TanjiCore.Intercept.Network
         { }
         public HNode(Socket client)
         {
-            if (client == null)
-            {
-                throw new ArgumentNullException(nameof(client));
-            }
-            Client = client;
+            Client = client ?? throw new ArgumentNullException(nameof(client));
         }
 
         public void Connect(string host, int port)
