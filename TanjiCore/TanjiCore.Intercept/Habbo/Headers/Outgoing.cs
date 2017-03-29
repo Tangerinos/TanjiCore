@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.Serialization.Json;
-using System.Text;
 
 namespace TanjiCore.Intercept.Habbo.Headers
 {
