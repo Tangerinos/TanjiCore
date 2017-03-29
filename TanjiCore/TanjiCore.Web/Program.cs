@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using System.Security.Cryptography.X509Certificates;
 
 namespace TanjiCore.Web
 {
@@ -11,10 +12,17 @@ namespace TanjiCore.Web
     {
         public static void Main(string[] args)
         {
+            var cert = new X509Certificate2("Kestrel.pfx", "password");
+
             var host = new WebHostBuilder()
-                .UseKestrel()
+                .UseKestrel(conf =>
+                {
+                    conf.NoDelay = true;
+                    // this doesn't really need to be secure
+                    conf.UseHttps(cert);
+                })
+                .UseUrls("https://localhost:8081")
                 .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
                 .UseStartup<Startup>()
                 .UseApplicationInsights()
                 .Build();

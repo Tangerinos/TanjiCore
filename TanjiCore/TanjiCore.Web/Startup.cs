@@ -28,10 +28,34 @@ namespace TanjiCore.Web
                 app.UseDeveloperExceptionPage();
             }
 
+            app.MapWhen(IsHabboCms, builder => builder.RunProxy(new ProxyOptions
+            {
+                Scheme = "https",
+                Host = "www.habbo.com",
+                Port = "443",
+                Strip = false,
+                StripPath = ""
+            }));
+
+            app.MapWhen(IsGameData, builder => builder.RunProxy(new ProxyOptions
+            {
+                Scheme = "https",
+                Host = "images.habbo.com",
+                Port = "443",
+                Strip = false,
+                StripPath = "/gamedata"
+            }));
+
             app.Run(async (context) =>
             {
                 await context.Response.WriteAsync("Hello World!");
             });
         }
+
+        private static bool IsHabboCms(HttpContext httpContext) =>
+            httpContext.Request.Path.Value.StartsWith(@"/", StringComparison.OrdinalIgnoreCase);
+
+        private static bool IsGameData(HttpContext httpContext) =>
+            httpContext.Request.Path.Value.StartsWith(@"/gamedata/", StringComparison.OrdinalIgnoreCase);
     }
 }
