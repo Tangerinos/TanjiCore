@@ -12,6 +12,8 @@ namespace TanjiCore.Web
     {
         public static void Main(string[] args)
         {
+            var class1 = new Intercept.Class1();
+
             var cert = new X509Certificate2("Kestrel.pfx", "password");
 
             var host = new WebHostBuilder()

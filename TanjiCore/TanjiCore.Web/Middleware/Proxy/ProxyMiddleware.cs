@@ -154,11 +154,11 @@ namespace TanjiCore.Web.Middleware.Proxy
                 content = content.Replace("*.habbo.com", "*");
                 return new ByteArrayContent(Encoding.UTF8.GetBytes(content));
             }
-            //else if (path.Contains("Habbo.swf"))
-            //{
+            else if (path.Contains("Habbo.swf"))
+            {
                 //return responseMessage.Content;
-                //return new ByteArrayContent(File.ReadAllBytes("asmd_Habbo.swf"));
-            //}
+                return new ByteArrayContent(File.ReadAllBytes("asmd_Habbo.swf"));
+            }
             else
             {
                 return responseMessage.Content;
