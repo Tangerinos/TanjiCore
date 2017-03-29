@@ -13,6 +13,9 @@
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Https" Version="1.1.1" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="asmd_Habbo.swf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Kestrel.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

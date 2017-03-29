@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using System.Text;
+using System.IO;
 
 namespace TanjiCore.Web.Middleware.Proxy
 {
@@ -83,7 +85,11 @@ namespace TanjiCore.Web.Middleware.Proxy
             // Copy the request headers
             foreach (var header in context.Request.Headers)
             {
-                if (!header.Key.Equals("Referer"))
+                if (header.Key.Equals("Referer") || header.Key.Equals("Origin"))
+                {
+                    requestMessage.Headers.TryAddWithoutValidation(header.Key, new string[] { header.Value[0].Replace("https://localhost:8081", "https://www.habbo.com") });
+                }
+                else
                 {
                     if (!requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray()) && requestMessage.Content != null)
                     {
@@ -94,25 +100,19 @@ namespace TanjiCore.Web.Middleware.Proxy
 
             requestMessage.Headers.Host = _options.Host + ":" + _options.Port;
             string path;
+
             if (_options.Strip)
                 path = context.Request.Path.Value.Replace(_options.StripPath, "");
             else
                 path = context.Request.Path;
+
             var uriString = $"{_options.Scheme}://{_options.Host}:{_options.Port}{context.Request.PathBase}{path}{context.Request.QueryString}";
             requestMessage.RequestUri = new Uri(uriString);
             requestMessage.Method = new HttpMethod(context.Request.Method);
             using (var responseMessage = await _httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, context.RequestAborted))
             {
-                if (path.Contains("clienturl"))
-                {
-                    var content = await responseMessage.Content.ReadAsStringAsync();
-                    responseMessage.Content = new StringContent(content.Replace("https://www.habbo.com", "https://localhost:8081"));
-                    context.Response.StatusCode = StatusCodes.Status200OK;
-                }
-                else
-                {
-                    context.Response.StatusCode = (int)responseMessage.StatusCode;
-                }
+                responseMessage.Content = await ReplaceContent(responseMessage, path);
+                context.Response.StatusCode = (int)responseMessage.StatusCode;
 
                 foreach (var header in responseMessage.Headers)
                 {
@@ -126,7 +126,42 @@ namespace TanjiCore.Web.Middleware.Proxy
                 
                 // SendAsync removes chunking from the response. This removes the header so it doesn't expect a chunked response.
                 context.Response.Headers.Remove("transfer-encoding");
-                await responseMessage.Content.CopyToAsync(context.Response.Body);
+                if (!context.Response.StatusCode.Equals(StatusCodes.Status204NoContent))
+                    await responseMessage.Content.CopyToAsync(context.Response.Body);
+            }
+        }
+
+        private async Task<HttpContent> ReplaceContent(HttpResponseMessage responseMessage, string path)
+        {
+            var content = await responseMessage.Content.ReadAsStringAsync();
+
+            if (path.StartsWith("/api/client/clienturl"))
+            {
+                content = content.Replace("https://www.habbo.com", "https://localhost:8081");
+                return new ByteArrayContent(Encoding.UTF8.GetBytes(content));
+            }
+            else if (path.StartsWith("/client/hhus-"))
+            {
+                content = content.Replace("images.habbo.com\\/", "localhost:8081\\/imagesdomain\\/");
+                content = content.Replace("images.habbo.com", "localhost:8081/imagesdomain");
+                //content = content.Replace("www.habbo.com\\/", "localhost:8081\\/");
+                content = content.Replace("www.habbo.com", "localhost:8081");
+                //content = content.Replace("//images.habbo.com/gordon/", "//localhost:8081/gamedata/gordon/");
+                return new ByteArrayContent(Encoding.UTF8.GetBytes(content));
+            }
+            else if (path.StartsWith("/crossdomain.xml"))
+            {
+                content = content.Replace("*.habbo.com", "*");
+                return new ByteArrayContent(Encoding.UTF8.GetBytes(content));
+            }
+            //else if (path.Contains("Habbo.swf"))
+            //{
+                //return responseMessage.Content;
+                //return new ByteArrayContent(File.ReadAllBytes("asmd_Habbo.swf"));
+            //}
+            else
+            {
+                return responseMessage.Content;
             }
         }
     }

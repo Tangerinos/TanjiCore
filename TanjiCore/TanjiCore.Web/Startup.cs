@@ -42,8 +42,8 @@ namespace TanjiCore.Web
                 Scheme = "https",
                 Host = "images.habbo.com",
                 Port = "443",
-                Strip = false,
-                StripPath = "/gamedata"
+                Strip = true,
+                StripPath = "/imagesdomain"
             }));
 
             app.Run(async (context) =>
@@ -52,10 +52,12 @@ namespace TanjiCore.Web
             });
         }
 
-        private static bool IsHabboCms(HttpContext httpContext) =>
-            httpContext.Request.Path.Value.StartsWith(@"/", StringComparison.OrdinalIgnoreCase);
+        private static bool IsHabboCms(HttpContext httpContext)
+        {
+            return httpContext.Request.Path.Value.StartsWith(@"/", StringComparison.OrdinalIgnoreCase) && !httpContext.Request.Path.Value.Contains("/imagesdomain");
+        }
 
         private static bool IsGameData(HttpContext httpContext) =>
-            httpContext.Request.Path.Value.StartsWith(@"/gamedata/", StringComparison.OrdinalIgnoreCase);
+            httpContext.Request.Path.Value.StartsWith(@"/imagesdomain/", StringComparison.OrdinalIgnoreCase);
     }
 }
