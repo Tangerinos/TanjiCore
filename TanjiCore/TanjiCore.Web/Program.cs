@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using System.Security.Cryptography.X509Certificates;
+using TanjiCore.Intercept.Network;
 
 namespace TanjiCore.Web
 {
@@ -12,7 +13,9 @@ namespace TanjiCore.Web
     {
         public static void Main(string[] args)
         {
-            var class1 = new Intercept.Class1();
+            // TODO: intercept and modify policy file in-transit **REQUIRED**
+            var conn = new HConnection();
+            conn.Intercept(HotelEndPoint.Parse("game-us.habbo.com", 38101));
 
             var cert = new X509Certificate2("Kestrel.pfx", "password");
 
@@ -20,7 +23,6 @@ namespace TanjiCore.Web
                 .UseKestrel(conf =>
                 {
                     conf.NoDelay = true;
-                    // this doesn't really need to be secure
                     conf.UseHttps(cert);
                 })
                 .UseUrls("https://localhost:8081")

@@ -144,9 +144,8 @@ namespace TanjiCore.Web.Middleware.Proxy
             {
                 content = content.Replace("images.habbo.com\\/", "localhost:8081\\/imagesdomain\\/");
                 content = content.Replace("images.habbo.com", "localhost:8081/imagesdomain");
-                //content = content.Replace("www.habbo.com\\/", "localhost:8081\\/");
                 content = content.Replace("www.habbo.com", "localhost:8081");
-                //content = content.Replace("//images.habbo.com/gordon/", "//localhost:8081/gamedata/gordon/");
+                content = content.Replace("game-us.habbo.com", "localhost");
                 return new ByteArrayContent(Encoding.UTF8.GetBytes(content));
             }
             else if (path.StartsWith("/crossdomain.xml"))
@@ -154,7 +153,7 @@ namespace TanjiCore.Web.Middleware.Proxy
                 content = content.Replace("*.habbo.com", "*");
                 return new ByteArrayContent(Encoding.UTF8.GetBytes(content));
             }
-            else if (path.Contains("Habbo.swf"))
+            else if (path.EndsWith("Habbo.swf"))
             {
                 //return responseMessage.Content;
                 return new ByteArrayContent(File.ReadAllBytes("asmd_Habbo.swf"));
