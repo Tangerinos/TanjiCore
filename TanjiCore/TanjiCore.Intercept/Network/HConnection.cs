@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -145,25 +146,14 @@ namespace TanjiCore.Intercept.Network
             HMessage packet = Local.ReceivePacket();
             if (packet != null)
             {
-                if (packet.Header == 4001)
-                {
-                    Local.Encrypter = new Crypto.RC4(Encoding.ASCII.GetBytes(packet.ReadString()));
-                    Local.IsEncrypting = true;
-                }
-
-                if (packet.Header == 157)
-                {
-                    packet = new HMessage(157, 401, "https://images.habbo.com/gordon/PRODUCTION-201703291204-497451196/", "https://www.habbo.com/gamedata/external_variables/1");
-                }
-
                 var args = new DataInterceptedEventArgs(packet, ++_outSteps, true);
                 try { OnDataOutgoing(args); }
                 catch { args.Restore(); }
 
                 if (!args.IsBlocked && !args.WasRelayed)
                 {
-                    if (Local.IsEncrypting)
-                        SendToServer(Local.Encrypter.Parse(args.Packet.ToBytes()));
+                    if (Remote.IsEncrypting)
+                        SendToServer(Remote.Encrypter.Parse(args.Packet.ToBytes()));
                     else
                         SendToServer(args.Packet);
                 }
@@ -231,6 +221,14 @@ namespace TanjiCore.Intercept.Network
             {
                 Disconnect();
             }
+        }
+
+        public static byte[] StringToByteArray(string hex)
+        {
+            return Enumerable.Range(0, hex.Length)
+                             .Where(x => x % 2 == 0)
+                             .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                             .ToArray();
         }
     }
 }
