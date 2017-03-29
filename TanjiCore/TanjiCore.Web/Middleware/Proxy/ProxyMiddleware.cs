@@ -83,9 +83,12 @@ namespace TanjiCore.Web.Middleware.Proxy
             // Copy the request headers
             foreach (var header in context.Request.Headers)
             {
-                if (!requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray()) && requestMessage.Content != null)
+                if (!header.Key.Equals("Referer"))
                 {
-                    requestMessage.Content?.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
+                    if (!requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray()) && requestMessage.Content != null)
+                    {
+                        requestMessage.Content?.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
+                    }
                 }
             }
 
@@ -100,8 +103,17 @@ namespace TanjiCore.Web.Middleware.Proxy
             requestMessage.Method = new HttpMethod(context.Request.Method);
             using (var responseMessage = await _httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, context.RequestAborted))
             {
-                context.Response.StatusCode = (int)responseMessage.StatusCode;
-                //responseMessage.Headers[""]
+                if (path.Contains("clienturl"))
+                {
+                    var content = await responseMessage.Content.ReadAsStringAsync();
+                    responseMessage.Content = new StringContent(content.Replace("https://www.habbo.com", "https://localhost:8081"));
+                    context.Response.StatusCode = StatusCodes.Status200OK;
+                }
+                else
+                {
+                    context.Response.StatusCode = (int)responseMessage.StatusCode;
+                }
+
                 foreach (var header in responseMessage.Headers)
                 {
                     context.Response.Headers[header.Key] = header.Value.ToArray();
@@ -111,14 +123,7 @@ namespace TanjiCore.Web.Middleware.Proxy
                 {
                     context.Response.Headers[header.Key] = header.Value.ToArray();
                 }
-
-                if (path.Contains("clienturl"))
-                {
-                    var content = await responseMessage.Content.ReadAsStringAsync();
-                    responseMessage.Content = new StringContent(content.Replace("https://www.habbo.com", "https://localhost:8081"));
-                }
-
-
+                
                 // SendAsync removes chunking from the response. This removes the header so it doesn't expect a chunked response.
                 context.Response.Headers.Remove("transfer-encoding");
                 await responseMessage.Content.CopyToAsync(context.Response.Body);
