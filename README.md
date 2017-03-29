@@ -18,7 +18,7 @@ dotnet run
 ## Server should now be active at https://localhost:8081
 ```
 
-Alternatively, just import the project with Visual Studio for local development on Windows. Change the run target from IISExpress to TanjiCore.Web if necessary.
+Alternatively, just import the project with Visual Studio for local development on Windows. Change the run target from IISExpress to TanjiCore<span></span>.Web if necessary.
 ##
 
 # Contributors
