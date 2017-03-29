@@ -101,6 +101,7 @@ namespace TanjiCore.Web.Middleware.Proxy
             using (var responseMessage = await _httpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, context.RequestAborted))
             {
                 context.Response.StatusCode = (int)responseMessage.StatusCode;
+                //responseMessage.Headers[""]
                 foreach (var header in responseMessage.Headers)
                 {
                     context.Response.Headers[header.Key] = header.Value.ToArray();
@@ -110,6 +111,13 @@ namespace TanjiCore.Web.Middleware.Proxy
                 {
                     context.Response.Headers[header.Key] = header.Value.ToArray();
                 }
+
+                if (path.Contains("clienturl"))
+                {
+                    var content = await responseMessage.Content.ReadAsStringAsync();
+                    responseMessage.Content = new StringContent(content.Replace("https://www.habbo.com", "https://localhost:8081"));
+                }
+
 
                 // SendAsync removes chunking from the response. This removes the header so it doesn't expect a chunked response.
                 context.Response.Headers.Remove("transfer-encoding");

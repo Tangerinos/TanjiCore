@@ -190,7 +190,7 @@ ClientBin/
 *.dbmdl
 *.dbproj.schemaview
 *.jfm
-*.pfx
+# *.pfx - we wanna distribute the pfx cert.
 *.publishsettings
 node_modules/
 orleans.codegen.cs
