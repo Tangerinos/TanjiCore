@@ -152,10 +152,7 @@ namespace TanjiCore.Intercept.Network
 
                 if (!args.IsBlocked && !args.WasRelayed)
                 {
-                    if (Remote.IsEncrypting)
-                        SendToServer(Remote.Encrypter.Parse(args.Packet.ToBytes()));
-                    else
-                        SendToServer(args.Packet);
+                    SendToServer(args.Packet);
                 }
                 if (!args.HasContinued)
                 {
