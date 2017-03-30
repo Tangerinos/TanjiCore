@@ -181,10 +181,7 @@ namespace TanjiCore.Intercept.Network
                 }
                 return read;
             }
-            catch (Exception ex)
-            {
-                return 0;
-            }
+            catch { return 0; }
         }
 
         public void Disconnect()
@@ -225,8 +222,7 @@ namespace TanjiCore.Intercept.Network
                 listener.Bind(new IPEndPoint(IPAddress.Any, port));
                 listener.Listen(1);
 
-                Socket client = listener.Accept();
-                return new HNode(client);
+                return new HNode(listener.Accept());
             }
         }
         public static HNode ConnectNew(string host, int port)
