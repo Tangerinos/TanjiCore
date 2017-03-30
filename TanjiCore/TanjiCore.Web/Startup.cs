@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using WebSocketManager;
 
 namespace TanjiCore.Web
 {
@@ -16,10 +17,11 @@ namespace TanjiCore.Web
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddWebSocketManager();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IServiceProvider serviceProvider, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole();
 
@@ -46,15 +48,20 @@ namespace TanjiCore.Web
                 StripPath = "/imagesdomain"
             }));
 
-            app.Run(async (context) =>
-            {
-                await context.Response.WriteAsync("Hello World!");
-            });
+            app.UseWebSockets();
+            app.MapWebSocketManager("/packet", serviceProvider.GetService<PacketHandler>());
+
+            app.UseStaticFiles();
         }
 
         private static bool IsHabboCms(HttpContext httpContext)
         {
-            return httpContext.Request.Path.Value.StartsWith(@"/", StringComparison.OrdinalIgnoreCase) && !httpContext.Request.Path.Value.Contains("/imagesdomain");
+            var path = httpContext.Request.Path.Value;
+
+            return path.StartsWith(@"/", StringComparison.OrdinalIgnoreCase) &&
+                !path.StartsWith("/imagesdomain", StringComparison.OrdinalIgnoreCase) &&
+                !path.StartsWith("/ui", StringComparison.OrdinalIgnoreCase) &&
+                !path.StartsWith("/packet", StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool IsGameData(HttpContext httpContext) =>

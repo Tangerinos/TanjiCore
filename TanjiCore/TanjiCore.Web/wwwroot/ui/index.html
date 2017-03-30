@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>TanjiCore UI</title>
+</head>
+<body>
+    <script data-main="scripts/main" src="WebSocketManager.js"></script>
+    <script language="javascript" type="text/javascript">
+        var connection = new WebSocketManager.Connection("wss://localhost:8081/packet");
+        connection.enableLogging = true;
+
+        connection.connectionMethods.onConnected = () => {
+            console.log("You are now connected! Connection ID: " + connection.connectionId);
+        }
+
+        connection.start();
+    </script>
+</body>
+</html>

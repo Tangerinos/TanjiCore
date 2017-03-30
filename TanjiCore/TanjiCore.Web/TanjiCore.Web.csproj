@@ -6,19 +6,20 @@
     <OutputType>exe</OutputType>
     <StartupObject />
   </PropertyGroup>
-
   <ItemGroup>
-    <Folder Include="wwwroot\" />
-    <Folder Include="wwwroot\" />
+    <Content Include="wwwroot\ui\index.html" />
+    <Content Include="wwwroot\ui\WebSocketManager.js" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Https" Version="1.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.1" />
     <PackageReference Include="System.Runtime.Serialization.Json" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TanjiCore.Intercept\TanjiCore.Intercept.csproj" />
+    <ProjectReference Include="..\WebSocketManager\WebSocketManager.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="asmd_Habbo.swf">
