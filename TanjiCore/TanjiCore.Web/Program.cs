@@ -1,23 +1,32 @@
 ﻿using System;
 using System.IO;
-using Microsoft.AspNetCore.Hosting;
-using System.Security.Cryptography.X509Certificates;
-using TanjiCore.Intercept.Network;
-using System.Threading.Tasks;
-using TanjiCore.Intercept.Network.Protocol;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+
+using Microsoft.AspNetCore.Hosting;
+
 using TanjiCore.Intercept.Crypto;
+using TanjiCore.Intercept.Habbo;
+using TanjiCore.Intercept.Network;
 
 namespace TanjiCore.Web
 {
     public class Program
     {
-        private static HConnection conn;
+        public static HGameData GameData { get; }
+        public static HConnection Connection { get; }
 
+        static Program()
+        {
+            GameData = new HGameData();
+
+            Connection = new HConnection();
+            Connection.DataOutgoing += DataOutgoing;
+            Connection.DataIncoming += DataIncoming;
+        }
         public static void Main(string[] args)
         {
             var cert = new X509Certificate2("Kestrel.pfx", "password");
-
             var host = new WebHostBuilder()
                 .UseKestrel(conf =>
                 {
@@ -30,24 +39,15 @@ namespace TanjiCore.Web
                 .UseApplicationInsights()
                 .Build();
 
-            Task.Factory.StartNew(() => {
-                // TODO: intercept and modify policy file in-transit **REQUIRED**
-                conn = new HConnection();
-                conn.Intercept(HotelEndPoint.Parse("game-us.habbo.com", 38101));
-                conn.DataOutgoing += Conn_DataOutgoing;
-                conn.DataIncoming += Conn_DataIncoming;
-            });
-
             host.Run();
-
-            
         }
 
-        private static void Conn_DataOutgoing(object sender, DataInterceptedEventArgs e)
+        private static void DataOutgoing(object sender, DataInterceptedEventArgs e)
         {
             if (e.Packet.Header == 4001)
             {
                 string sharedKeyHex = e.Packet.ReadString();
+
                 if (sharedKeyHex.Length % 2 != 0)
                     sharedKeyHex = ("0" + sharedKeyHex);
 
@@ -55,25 +55,15 @@ namespace TanjiCore.Web
                     .Select(x => Convert.ToByte(sharedKeyHex.Substring(x * 2, 2), 16))
                     .ToArray();
 
-                conn.Remote.Encrypter = new RC4(sharedKey);
-                conn.Remote.IsEncrypting = true;
+                Connection.Remote.Encrypter = new RC4(sharedKey);
+                Connection.Remote.IsEncrypting = true;
                 e.IsBlocked = true;
             }
-
-            if (e.Packet.Header == 157)
-            {
-                e.Packet.ReadInteger();
-                string prod = e.Packet.ReadString().Replace("localhost:8081/imagesdomain", "images.habbo.com");
-                string extvar = e.Packet.ReadString().Replace("localhost:8081", "www.habbo.com");
-                e.Packet = new HMessage(157, 401, prod, extvar);
-            }
-
-            Console.WriteLine("Outgoing [{0}]: {1}", e.Packet.Header, e.Packet.ToString());
+            Console.WriteLine("Outgoing[{0}]: {1}\r\n----------", e.Packet.Header, e.Packet);
         }
-
-        private static void Conn_DataIncoming(object sender, DataInterceptedEventArgs e)
+        private static void DataIncoming(object sender, DataInterceptedEventArgs e)
         {
-            Console.WriteLine("Incoming [{0}]: {1}", e.Packet.Header, e.Packet.ToString());
+            Console.WriteLine("Incoming[{0}]: {1}\r\n----------", e.Packet.Header, e.Packet);
         }
     }
 }
