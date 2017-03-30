@@ -79,7 +79,7 @@ namespace TanjiCore.Intercept.Network
                 try
                 {
                     Local = HNode.Accept(endpoint.Port);
-                    
+
                     if (++interceptCount == SocketSkip)
                     {
                         interceptCount = 0;
@@ -218,14 +218,6 @@ namespace TanjiCore.Intercept.Network
             {
                 Disconnect();
             }
-        }
-
-        public static byte[] StringToByteArray(string hex)
-        {
-            return Enumerable.Range(0, hex.Length)
-                             .Where(x => x % 2 == 0)
-                             .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
-                             .ToArray();
         }
     }
 }
