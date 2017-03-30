@@ -3,8 +3,6 @@
     public enum MessageType
     {
         Text,
-        IncomingPacket,
-        OutgoingPacket,
         ClientMethodInvocation,
         ConnectionEvent
     }

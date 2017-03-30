@@ -158,10 +158,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 	(function (MessageType) {
         MessageType[MessageType["Text"] = 0] = "Text";
-        MessageType[MessageType["IncomingPacket"] = 1] = "IncomingPacket";
-        MessageType[MessageType["OutgoingPacket"] = 2] = "OutgoingPacket";
-	    MessageType[MessageType["MethodInvocation"] = 3] = "MethodInvocation";
-	    MessageType[MessageType["ConnectionEvent"] = 4] = "ConnectionEvent";
+	    MessageType[MessageType["MethodInvocation"] = 1] = "MethodInvocation";
+	    MessageType[MessageType["ConnectionEvent"] = 2] = "ConnectionEvent";
 	})(exports.MessageType || (exports.MessageType = {}));
 	var MessageType = exports.MessageType;
 	var Message = (function () {
