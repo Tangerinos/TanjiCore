@@ -16,6 +16,7 @@ namespace TanjiCore.Web
 {
     public class Program
     {
+        public static HGame Game { get; set; }
         public static HGameData GameData { get; }
         public static HConnection Connection { get; }
         public static PacketHandler Handler { get; private set; }
