@@ -171,13 +171,20 @@ namespace TanjiCore.Intercept.Network
                 return 0;
             }
 
-            int read = Client.Receive(buffer, offset, size, socketFlags);
-            if (read > 0 && IsDecrypting && Decrypter != null)
+            try
             {
-                Decrypter.RefParse(buffer, offset, read,
-                    socketFlags.HasFlag(SocketFlags.Peek));
+                int read = Client.Receive(buffer, offset, size, socketFlags);
+                if (read > 0 && IsDecrypting && Decrypter != null)
+                {
+                    Decrypter.RefParse(buffer, offset, read,
+                        socketFlags.HasFlag(SocketFlags.Peek));
+                }
+                return read;
             }
-            return read;
+            catch (Exception ex)
+            {
+                return 0;
+            }
         }
 
         public void Disconnect()

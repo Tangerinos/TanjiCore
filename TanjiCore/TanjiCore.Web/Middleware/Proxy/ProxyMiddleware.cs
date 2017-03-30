@@ -146,6 +146,7 @@ namespace TanjiCore.Web.Middleware.Proxy
                 content = content.Replace("images.habbo.com", "localhost:8081/imagesdomain");
                 content = content.Replace("www.habbo.com", "localhost:8081");
                 content = content.Replace("game-us.habbo.com", "localhost");
+                content = content.Replace("38101,843", "38101");
                 return new ByteArrayContent(Encoding.UTF8.GetBytes(content));
             }
             else if (path.StartsWith("/crossdomain.xml"))

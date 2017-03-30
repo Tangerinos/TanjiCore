@@ -22,7 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="asmd_Habbo.swf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Kestrel.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
