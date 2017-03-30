@@ -10,6 +10,7 @@
     <Content Include="wwwroot\ui\index.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="wwwroot\ui\logger.js" />
     <Content Include="wwwroot\ui\WebSocketManager.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

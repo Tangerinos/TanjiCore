@@ -71,11 +71,11 @@ namespace TanjiCore.Web
                 e.IsBlocked = true;
             }
 
-            Console.WriteLine("Outgoing[{0}]: {1}\r\n----------", e.Packet.Header, e.Packet);
+            //Console.WriteLine("Outgoing[{0}]: {1}\r\n----------", e.Packet.Header, e.Packet);
         }
         private static void DataIncoming(object sender, DataInterceptedEventArgs e)
         {
-            Console.WriteLine("Incoming[{0}]: {1}\r\n----------", e.Packet.Header, e.Packet);
+            //Console.WriteLine("Incoming[{0}]: {1}\r\n----------", e.Packet.Header, e.Packet);
         }
     }
 }

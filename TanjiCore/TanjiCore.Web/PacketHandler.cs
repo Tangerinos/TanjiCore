@@ -17,7 +17,7 @@ namespace TanjiCore.Web
         {
             await base.OnConnected(socket);
 
-            var socketId = WebSocketConnectionManager.GetId(socket);
+            /*var socketId = WebSocketConnectionManager.GetId(socket);
 
             var message = new Message()
             {
@@ -25,12 +25,15 @@ namespace TanjiCore.Web
                 Data = $"{socketId} is now connected"
             };
 
-            await SendMessageToAllAsync(message);
+            await SendMessage("outgoing", "test");
+            await SendMessage("outgoing", "test");
+            await SendMessage("outgoing", "test");
+            await SendMessageToAllAsync(message);*/
         }
 
-        public async Task SendMessage(string socketId, string message)
+        public async Task SendMessage(string direction, string message)
         {
-            await InvokeClientMethodToAllAsync("receiveMessage", socketId, message);
+            await InvokeClientMethodToAllAsync("receiveMessage", direction, message);
         }
 
         public override async Task OnDisconnected(WebSocket socket)
@@ -49,24 +52,12 @@ namespace TanjiCore.Web
 
         public void PacketOutgoing(object sender, DataInterceptedEventArgs e)
         {
-            var message = new Message()
-            {
-                MessageType = MessageType.Text,
-                Data = $"Outgoing [{e.Packet.Header}]: {e.Packet.ToString()}"
-            };
-
-            SendMessageToAllAsync(message).Wait();
+            SendMessage("outgoing", $"Outgoing: [{e.Packet.Header}]: {e.Packet.ToString()}").Wait();
         }
 
         public void PacketIncoming(object sender, DataInterceptedEventArgs e)
         {
-            var message = new Message()
-            {
-                MessageType = MessageType.Text,
-                Data = $"Incoming [{e.Packet.Header}]: {e.Packet.ToString()}"
-            };
-
-            SendMessageToAllAsync(message).Wait();
+            SendMessage("incoming", $"Incoming: [{e.Packet.Header}]: {e.Packet.ToString()}").Wait();
         }
     }
 }
