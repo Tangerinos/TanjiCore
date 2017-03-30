@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using WebSocketManager;
 
 namespace TanjiCore.Web
 {
@@ -16,26 +17,22 @@ namespace TanjiCore.Web
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddWebSocketManager();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IServiceProvider serviceProvider, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole();
-
             if (env.IsDevelopment())
             {
+                loggerFactory.AddConsole();
                 app.UseDeveloperExceptionPage();
             }
 
-            app.MapWhen(IsHabboCms, builder => builder.RunProxy(new ProxyOptions
-            {
-                Scheme = "https",
-                Host = "www.habbo.com",
-                Port = "443",
-                Strip = false,
-                StripPath = ""
-            }));
+            app.MapWhen(IsUi, builder => builder.UseFileServer());
+
+            app.UseWebSockets();
+            app.MapWebSocketManager("/packet", serviceProvider.GetService<PacketHandler>());
 
             app.MapWhen(IsGameData, builder => builder.RunProxy(new ProxyOptions
             {
@@ -46,18 +43,26 @@ namespace TanjiCore.Web
                 StripPath = "/imagesdomain"
             }));
 
-            app.Run(async (context) =>
+            app.MapWhen(IsHabboCms, builder => builder.RunProxy(new ProxyOptions
             {
-                await context.Response.WriteAsync("Hello World!");
-            });
+                Scheme = "https",
+                Host = "www.habbo.com",
+                Port = "443",
+                Strip = false,
+                StripPath = ""
+            }));
         }
 
-        private static bool IsHabboCms(HttpContext httpContext)
-        {
-            return httpContext.Request.Path.Value.StartsWith(@"/", StringComparison.OrdinalIgnoreCase) && !httpContext.Request.Path.Value.Contains("/imagesdomain");
-        }
+        private static bool IsUi(HttpContext httpContext) =>
+            httpContext.Request.Path.Value.StartsWith("/ui", StringComparison.OrdinalIgnoreCase);
+
+        private static bool IsPacket(HttpContext httpContext) =>
+            httpContext.Request.Path.Value.StartsWith("/packet", StringComparison.OrdinalIgnoreCase);
 
         private static bool IsGameData(HttpContext httpContext) =>
-            httpContext.Request.Path.Value.StartsWith(@"/imagesdomain/", StringComparison.OrdinalIgnoreCase);
+            httpContext.Request.Path.Value.StartsWith("/imagesdomain", StringComparison.OrdinalIgnoreCase);
+
+        private static bool IsHabboCms(HttpContext httpContext) =>
+            httpContext.Request.Path.Value.StartsWith("/", StringComparison.OrdinalIgnoreCase);
     }
 }

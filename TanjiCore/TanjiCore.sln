@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TanjiCore.Intercept", "Tanj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TanjiCore.Flazzy", "TanjiCore.Flazzy\TanjiCore.Flazzy.csproj", "{6D438CA7-A4B3-4AC1-94A6-3BB53C2F8DA4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketManager", "WebSocketManager\WebSocketManager.csproj", "{80CDDD7F-78AA-4DBD-B7EC-DA2C69DC8DCA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketManager.Common", "WebSocketManager.Common\WebSocketManager.Common.csproj", "{EE6D3EDE-2BD1-4063-8FD1-2D344E8434F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{6D438CA7-A4B3-4AC1-94A6-3BB53C2F8DA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D438CA7-A4B3-4AC1-94A6-3BB53C2F8DA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D438CA7-A4B3-4AC1-94A6-3BB53C2F8DA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80CDDD7F-78AA-4DBD-B7EC-DA2C69DC8DCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80CDDD7F-78AA-4DBD-B7EC-DA2C69DC8DCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80CDDD7F-78AA-4DBD-B7EC-DA2C69DC8DCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80CDDD7F-78AA-4DBD-B7EC-DA2C69DC8DCA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE6D3EDE-2BD1-4063-8FD1-2D344E8434F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE6D3EDE-2BD1-4063-8FD1-2D344E8434F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE6D3EDE-2BD1-4063-8FD1-2D344E8434F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE6D3EDE-2BD1-4063-8FD1-2D344E8434F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

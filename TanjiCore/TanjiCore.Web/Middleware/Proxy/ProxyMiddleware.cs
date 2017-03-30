@@ -13,6 +13,8 @@ using Microsoft.Extensions.Options;
 using System.Text;
 using System.IO;
 using TanjiCore.Intercept.Habbo;
+using TanjiCore.Flazzy;
+using TanjiCore.Intercept.Network;
 
 namespace TanjiCore.Web.Middleware.Proxy
 {
@@ -132,34 +134,74 @@ namespace TanjiCore.Web.Middleware.Proxy
             }
         }
 
+        private void InterceptConnection()
+        {
+            string[] ports = Program.GameData.InfoPort.Split(',');
+            if (ports.Length == 0 || !ushort.TryParse(ports[0], out ushort port) ||
+                !HotelEndPoint.TryParse(Program.GameData.InfoHost, port, out HotelEndPoint endpoint))
+            {
+                throw new Exception("Failed to parse: " + Program.GameData.InfoPort);
+            }
+            Program.Connection.Intercept(endpoint);
+        }
         private async Task<HttpContent> ReplaceContent(HttpResponseMessage responseMessage, string path)
         {
-            var content = await responseMessage.Content.ReadAsStringAsync();
-
             if (path.StartsWith("/api/client/clienturl"))
             {
-                content = content.Replace("https://www.habbo.com", "https://localhost:8081");
-                return new ByteArrayContent(Encoding.UTF8.GetBytes(content));
+                string body = await responseMessage.Content.ReadAsStringAsync();
+                body = body.Replace("https://www.habbo.com", "https://localhost:8081");
+
+                return new ByteArrayContent(Encoding.UTF8.GetBytes(body));
             }
-            else if (path.StartsWith("/client/hhus-"))
+            else if (path.StartsWith("/client/hhus-") && string.IsNullOrWhiteSpace(Program.GameData.Source))
             {
-                Program.GameData.Source = content;
-                content = content.Replace(Program.GameData.InfoHost, "127.0.0.1");
+                string body = await responseMessage.Content.ReadAsStringAsync();
+                Program.GameData.Source = body;
 
-                string flashClientUrl = Program.GameData["flash.client.url"];
-                int gordonIndex = flashClientUrl.IndexOf("gordon");
+                body = body.Replace(Program.GameData.InfoHost, "127.0.0.1")
+                    .Replace("www.habbo.com", "localhost:8081")
+                    .Replace("images.habbo.com\\/", "localhost:8081\\/imagesdomain\\/")
+                    .Replace("images.habbo.com", "localhost:8081/imagesdomain");
 
-                content = content.Replace(flashClientUrl, ("localhost:8081/imagesdomain/" + flashClientUrl.Substring(gordonIndex)));
-                return new ByteArrayContent(Encoding.UTF8.GetBytes(content));
+                return new ByteArrayContent(Encoding.UTF8.GetBytes(body));
+            }
+            else if (path.Contains("external_variables"))
+            {
+                var content = await responseMessage.Content.ReadAsStringAsync();
+                content = content.Replace("images.habbo.com", "localhost:8081/imagesdomain");
+
+                return new StringContent(content);
             }
             else if (path.EndsWith("Habbo.swf"))
             {
-                var port = ushort.Parse(Program.GameData.InfoPort.Split(',')[0]);
+                Uri remoteUrl = responseMessage.RequestMessage.RequestUri;
+                //string clientPath = Path.GetFullPath($"Modified Clients/{remoteUrl.Host}/{remoteUrl.LocalPath}");
 
-                Task interceptTask = Task.Factory.StartNew(
-                    () => Program.Connection.Intercept(Program.GameData.InfoHost, port), TaskCreationOptions.LongRunning);
+                // TODO: Where should we put these files?
+                //string clientDirectory = Path.GetDirectoryName(clientPath);
+                //Directory.CreateDirectory(clientDirectory);
 
-                return new ByteArrayContent(File.ReadAllBytes("asmd_Habbo.swf"));
+                byte[] payload = await responseMessage.Content.ReadAsByteArrayAsync();
+                Program.Game = new HGame(payload);
+                Program.Game.Disassemble();
+
+                // TODO: Program.GenerateMessageHashes();
+
+                Program.Game.DisableHostChecks();
+                Program.Game.InjectKeyShouter(4001);
+
+                CompressionKind compression = CompressionKind.ZLIB;
+//#if DEBUG
+                //compression = CompressionKind.None;
+//#endif
+
+                payload = Program.Game.ToArray(compression);
+                //File.WriteAllBytes(clientPath, payload); // This is so we can just intercept the HTTP(
+
+                var interceptConnectionTask = Task.Factory.StartNew(
+                    InterceptConnection, TaskCreationOptions.LongRunning);
+
+                return new ByteArrayContent(payload);
             }
             return responseMessage.Content;
         }

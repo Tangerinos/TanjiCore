@@ -4,17 +4,22 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 using TanjiCore.Intercept.Crypto;
 using TanjiCore.Intercept.Habbo;
 using TanjiCore.Intercept.Network;
+using System.Threading.Tasks;
+using WebSocketManager;
 
 namespace TanjiCore.Web
 {
     public class Program
     {
+        public static HGame Game { get; set; }
         public static HGameData GameData { get; }
         public static HConnection Connection { get; }
+        public static PacketHandler Handler { get; private set; }
 
         static Program()
         {
@@ -24,6 +29,7 @@ namespace TanjiCore.Web
             Connection.DataOutgoing += DataOutgoing;
             Connection.DataIncoming += DataIncoming;
         }
+
         public static void Main(string[] args)
         {
             var cert = new X509Certificate2("Kestrel.pfx", "password");
@@ -38,6 +44,11 @@ namespace TanjiCore.Web
                 .UseStartup<Startup>()
                 .UseApplicationInsights()
                 .Build();
+
+            Handler = host.Services.GetService<PacketHandler>();
+            
+            Connection.DataOutgoing += Handler.PacketOutgoing;
+            Connection.DataIncoming += Handler.PacketIncoming;
 
             host.Run();
         }
@@ -59,11 +70,12 @@ namespace TanjiCore.Web
                 Connection.Remote.IsEncrypting = true;
                 e.IsBlocked = true;
             }
-            Console.WriteLine("Outgoing[{0}]: {1}\r\n----------", e.Packet.Header, e.Packet);
+
+            //Console.WriteLine("Outgoing[{0}]: {1}\r\n----------", e.Packet.Header, e.Packet);
         }
         private static void DataIncoming(object sender, DataInterceptedEventArgs e)
         {
-            Console.WriteLine("Incoming[{0}]: {1}\r\n----------", e.Packet.Header, e.Packet);
+            //Console.WriteLine("Incoming[{0}]: {1}\r\n----------", e.Packet.Header, e.Packet);
         }
     }
 }
