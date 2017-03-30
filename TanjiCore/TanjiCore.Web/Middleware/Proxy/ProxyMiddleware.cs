@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using System.Text;
 using System.IO;
+using TanjiCore.Intercept.Habbo;
 
 namespace TanjiCore.Web.Middleware.Proxy
 {
@@ -123,7 +124,7 @@ namespace TanjiCore.Web.Middleware.Proxy
                 {
                     context.Response.Headers[header.Key] = header.Value.ToArray();
                 }
-                
+
                 // SendAsync removes chunking from the response. This removes the header so it doesn't expect a chunked response.
                 context.Response.Headers.Remove("transfer-encoding");
                 if (!context.Response.StatusCode.Equals(StatusCodes.Status204NoContent))
@@ -142,29 +143,25 @@ namespace TanjiCore.Web.Middleware.Proxy
             }
             else if (path.StartsWith("/client/hhus-"))
             {
-                content = content.Replace("images.habbo.com\\/", "localhost:8081\\/imagesdomain\\/");
-                content = content.Replace("images.habbo.com", "localhost:8081/imagesdomain");
-                content = content.Replace("www.habbo.com", "localhost:8081");
-                content = content.Replace("game-us.habbo.com", "localhost");
-                content = content.Replace("38101,843", "38101");
-                return new ByteArrayContent(Encoding.UTF8.GetBytes(content));
-            }
-            else if (path.StartsWith("/crossdomain.xml"))
-            {
-                content = content.Replace("*.habbo.com", "*");
+                Program.GameData.Source = content;
+                content = content.Replace(Program.GameData.InfoHost, "127.0.0.1");
+
+                string flashClientUrl = Program.GameData["flash.client.url"];
+                int gordonIndex = flashClientUrl.IndexOf("gordon");
+
+                content = content.Replace(flashClientUrl, ("localhost:8081/imagesdomain/" + flashClientUrl.Substring(gordonIndex)));
                 return new ByteArrayContent(Encoding.UTF8.GetBytes(content));
             }
             else if (path.EndsWith("Habbo.swf"))
             {
-                //return responseMessage.Content;
+                var port = ushort.Parse(Program.GameData.InfoPort.Split(',')[0]);
+
+                Task interceptTask = Task.Factory.StartNew(
+                    () => Program.Connection.Intercept(Program.GameData.InfoHost, port), TaskCreationOptions.LongRunning);
+
                 return new ByteArrayContent(File.ReadAllBytes("asmd_Habbo.swf"));
             }
-            else
-            {
-                //content = content.Replace("images.habbo.com", "localhost:8081/imagesdomain");
-                //return new ByteArrayContent(Encoding.UTF8.GetBytes(content));
-                return responseMessage.Content;
-            }
+            return responseMessage.Content;
         }
     }
 }
