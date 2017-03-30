@@ -23,21 +23,16 @@ namespace TanjiCore.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IServiceProvider serviceProvider, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole();
-
             if (env.IsDevelopment())
             {
+                loggerFactory.AddConsole();
                 app.UseDeveloperExceptionPage();
             }
 
-            app.MapWhen(IsHabboCms, builder => builder.RunProxy(new ProxyOptions
-            {
-                Scheme = "https",
-                Host = "www.habbo.com",
-                Port = "443",
-                Strip = false,
-                StripPath = ""
-            }));
+            app.MapWhen(IsUi, builder => builder.UseFileServer());
+
+            app.UseWebSockets();
+            app.MapWebSocketManager("/packet", serviceProvider.GetService<PacketHandler>());
 
             app.MapWhen(IsGameData, builder => builder.RunProxy(new ProxyOptions
             {
@@ -48,23 +43,26 @@ namespace TanjiCore.Web
                 StripPath = "/imagesdomain"
             }));
 
-            app.UseWebSockets();
-            app.MapWebSocketManager("/packet", serviceProvider.GetService<PacketHandler>());
-
-            app.UseStaticFiles();
+            app.MapWhen(IsHabboCms, builder => builder.RunProxy(new ProxyOptions
+            {
+                Scheme = "https",
+                Host = "www.habbo.com",
+                Port = "443",
+                Strip = false,
+                StripPath = ""
+            }));
         }
 
-        private static bool IsHabboCms(HttpContext httpContext)
-        {
-            var path = httpContext.Request.Path.Value;
+        private static bool IsUi(HttpContext httpContext) =>
+            httpContext.Request.Path.Value.StartsWith("/ui", StringComparison.OrdinalIgnoreCase);
 
-            return path.StartsWith(@"/", StringComparison.OrdinalIgnoreCase) &&
-                !path.StartsWith("/imagesdomain", StringComparison.OrdinalIgnoreCase) &&
-                !path.StartsWith("/ui", StringComparison.OrdinalIgnoreCase) &&
-                !path.StartsWith("/packet", StringComparison.OrdinalIgnoreCase);
-        }
+        private static bool IsPacket(HttpContext httpContext) =>
+            httpContext.Request.Path.Value.StartsWith("/packet", StringComparison.OrdinalIgnoreCase);
 
         private static bool IsGameData(HttpContext httpContext) =>
-            httpContext.Request.Path.Value.StartsWith(@"/imagesdomain/", StringComparison.OrdinalIgnoreCase);
+            httpContext.Request.Path.Value.StartsWith("/imagesdomain", StringComparison.OrdinalIgnoreCase);
+
+        private static bool IsHabboCms(HttpContext httpContext) =>
+            httpContext.Request.Path.Value.StartsWith("/", StringComparison.OrdinalIgnoreCase);
     }
 }

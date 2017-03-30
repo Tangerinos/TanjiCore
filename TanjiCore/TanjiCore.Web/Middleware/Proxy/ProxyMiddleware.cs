@@ -165,14 +165,21 @@ namespace TanjiCore.Web.Middleware.Proxy
 
                 return new ByteArrayContent(Encoding.UTF8.GetBytes(body));
             }
+            else if (path.Contains("external_variables"))
+            {
+                var content = await responseMessage.Content.ReadAsStringAsync();
+                content = content.Replace("images.habbo.com", "localhost:8081/imagesdomain");
+
+                return new StringContent(content);
+            }
             else if (path.EndsWith("Habbo.swf"))
             {
                 Uri remoteUrl = responseMessage.RequestMessage.RequestUri;
-                string clientPath = Path.GetFullPath($"Modified Clients/{remoteUrl.Host}/{remoteUrl.LocalPath}");
+                //string clientPath = Path.GetFullPath($"Modified Clients/{remoteUrl.Host}/{remoteUrl.LocalPath}");
 
                 // TODO: Where should we put these files?
-                string clientDirectory = Path.GetDirectoryName(clientPath);
-                Directory.CreateDirectory(clientDirectory);
+                //string clientDirectory = Path.GetDirectoryName(clientPath);
+                //Directory.CreateDirectory(clientDirectory);
 
                 byte[] payload = await responseMessage.Content.ReadAsByteArrayAsync();
                 Program.Game = new HGame(payload);
@@ -184,12 +191,12 @@ namespace TanjiCore.Web.Middleware.Proxy
                 Program.Game.InjectKeyShouter(4001);
 
                 CompressionKind compression = CompressionKind.ZLIB;
-#if DEBUG
-                compression = CompressionKind.None;
-#endif
+//#if DEBUG
+                //compression = CompressionKind.None;
+//#endif
 
                 payload = Program.Game.ToArray(compression);
-                File.WriteAllBytes(clientPath, payload); // This is so we can just intercept the HTTP(
+                //File.WriteAllBytes(clientPath, payload); // This is so we can just intercept the HTTP(
 
                 var interceptConnectionTask = Task.Factory.StartNew(
                     InterceptConnection, TaskCreationOptions.LongRunning);

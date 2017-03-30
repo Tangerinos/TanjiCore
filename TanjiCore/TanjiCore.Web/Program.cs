@@ -39,7 +39,7 @@ namespace TanjiCore.Web
                     conf.NoDelay = true;
                     conf.UseHttps(cert);
                 })
-                .UseUrls("http://localhost:8082", "https://localhost:8081")
+                .UseUrls("https://localhost:8081")
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<Startup>()
                 .UseApplicationInsights()
