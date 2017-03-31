@@ -190,7 +190,7 @@ namespace TanjiCore.Intercept.Network
             {
                 try
                 {
-                    Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, false);
+                    //Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, false);
                     Client.Shutdown(SocketShutdown.Both);
                     Client.Dispose();
                 }
@@ -208,7 +208,7 @@ namespace TanjiCore.Intercept.Network
             {
                 if (IsConnected)
                 {
-                    Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
+                    //Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
                     Client.Shutdown(SocketShutdown.Both);
                 }
                 Client.Dispose();

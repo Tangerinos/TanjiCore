@@ -9,8 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using TanjiCore.Intercept.Crypto;
 using TanjiCore.Intercept.Habbo;
 using TanjiCore.Intercept.Network;
-using System.Threading.Tasks;
-using WebSocketManager;
 
 namespace TanjiCore.Web
 {

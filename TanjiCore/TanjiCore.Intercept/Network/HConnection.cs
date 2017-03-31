@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net;
+using System.Net.Sockets;
 
 using TanjiCore.Intercept.Network.Protocol;
 
@@ -14,6 +15,7 @@ namespace TanjiCore.Intercept.Network
         private int _inSteps, _outSteps;
         private readonly object _disposeLock;
         private readonly object _disconnectLock;
+        private Socket listener;
 
         /// <summary>
         /// Occurs when the connection between the game client, and server have been intercepted.
@@ -73,12 +75,16 @@ namespace TanjiCore.Intercept.Network
         }
         public void Intercept(HotelEndPoint endpoint)
         {
+            listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            listener.Bind(new IPEndPoint(IPAddress.Any, 38101));
+            listener.Listen(1);
+
             int interceptCount = 0;
             while (!IsConnected)
             {
                 try
                 {
-                    Local = HNode.Accept(endpoint.Port);
+                    Local = new HNode(listener.Accept());
 
                     if (++interceptCount == SocketSkip)
                     {
