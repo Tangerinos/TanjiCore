@@ -1,5 +1,6 @@
 # TanjiCore
-
+This repo has been moved to https://gitlab.com/Harble/TanjiCore, this version will no longer be maintained.
+--
 Because Tangerines can be web apps too, damn it.
 ##
 
