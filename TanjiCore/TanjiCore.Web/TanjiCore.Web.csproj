@@ -7,13 +7,13 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="wwwroot\ui\index.html">
+    <!--Content Include="wwwroot\">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="wwwroot\ui\logger.js" />
     <Content Include="wwwroot\ui\WebSocketManager.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </Content-->
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
